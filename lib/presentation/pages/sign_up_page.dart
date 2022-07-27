@@ -295,16 +295,42 @@ class _SignUpPageState extends State<SignUpPage> {
             Navigator.pushNamedAndRemoveUntil(
                 context, '/main', (route) => false);
           } else if (state is AuthFailed) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.red,
-                content: Text(
-                  state.error,
-                  style: GoogleFonts.montserrat(
-                      fontSize: 14, fontWeight: FontWeight.w600),
+            if (state.error ==
+                '[firebase_auth/email-already-in-use] The email address is already in use by another account.') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    "Email ini sudah tidak tersedia",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
                 ),
-              ),
-            );
+              );
+            } else if (state.error ==
+                "[firebase_auth/unknown] Given String is empty or null") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    "Form tidak boleh di kosongkan",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    state.error,
+                    style: GoogleFonts.montserrat(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              );
+            }
           }
         },
         builder: (context, state) {
@@ -314,11 +340,13 @@ class _SignUpPageState extends State<SignUpPage> {
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: Colors.green[400],
+                color: Colors.teal.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
               ),
             );
           }
