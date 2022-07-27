@@ -2,6 +2,7 @@ import 'package:authentication_app/auth/providers/auth_cubit.dart';
 import 'package:authentication_app/presentation/pages/main_page.dart';
 import 'package:authentication_app/presentation/pages/sign_in_page.dart';
 import 'package:authentication_app/presentation/pages/sign_up_page.dart';
+import 'package:authentication_app/presentation/pages/splash_screen_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,8 +28,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         routes: {
-          '/': (context) => const SignUpPage(),
-          '/sign-ip': (context) => const SignInPage(),
+          '/': (context) => const SplashScreenPage(),
+          '/sign-up': (context) => const SignUpPage(),
+          '/sign-in': (context) => const SignInPage(),
           '/main': (context) => const MainPage(),
         },
       ),

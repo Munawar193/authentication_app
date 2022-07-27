@@ -1,5 +1,7 @@
+import 'package:authentication_app/auth/providers/auth_cubit.dart';
 import 'package:authentication_app/presentation/pages/sign_up_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignInPage extends StatefulWidget {
@@ -10,6 +12,9 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  TextEditingController emailController = TextEditingController(text: '');
+  TextEditingController passwordController = TextEditingController(text: '');
+
   bool _isVisible = false;
 
   @override
@@ -58,6 +63,7 @@ class _SignInPageState extends State<SignInPage> {
           borderRadius: BorderRadius.circular(14),
         ),
         child: TextFormField(
+          controller: emailController,
           style: GoogleFonts.montserrat(
             fontWeight: FontWeight.w400,
             color: Colors.black54,
@@ -65,7 +71,7 @@ class _SignInPageState extends State<SignInPage> {
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.only(top: 1),
             border: InputBorder.none,
-            hintText: 'masukan password',
+            hintText: 'masukan email',
             hintStyle: GoogleFonts.montserrat(
               fontWeight: FontWeight.w400,
               color: Colors.black54,
@@ -88,6 +94,7 @@ class _SignInPageState extends State<SignInPage> {
         ),
         child: Center(
           child: TextFormField(
+            controller: passwordController,
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w400,
               color: Colors.black54,
@@ -144,27 +151,69 @@ class _SignInPageState extends State<SignInPage> {
     }
 
     Widget buttonSubmit() {
-      return Container(
-        width: double.infinity,
-        height: 55,
-        margin: const EdgeInsets.only(
-          bottom: 30,
-        ),
-        child: TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.teal,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+      return BlocConsumer<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthSuccess) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/main', (route) => false);
+          } else if (state is AuthFailed) {
+            SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                state.error,
+                style: GoogleFonts.montserrat(
+                    fontSize: 14, fontWeight: FontWeight.w600),
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is AuthLoading) {
+            return Container(
+              height: 55,
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 30),
+              decoration: BoxDecoration(
+                color: Colors.tealAccent,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+              ),
+            );
+          }
+          return Container(
+            width: double.infinity,
+            height: 55,
+            margin: const EdgeInsets.only(
+              bottom: 30,
             ),
-            shadowColor: Colors.white,
-          ),
-          onPressed: () {},
-          child: Text(
-            'Login',
-            style: GoogleFonts.montserrat(
-                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-        ),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.teal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                shadowColor: Colors.white,
+              ),
+              onPressed: () {
+                context.read<AuthCubit>().signIn(
+                      email: emailController.text,
+                      password: passwordController.text,
+                    );
+              },
+              child: Text(
+                'Login',
+                style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+          );
+        },
       );
     }
 
@@ -186,8 +235,12 @@ class _SignInPageState extends State<SignInPage> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SignUpPage(),
+                ),
+              );
             },
             child: Container(
               alignment: Alignment.center,

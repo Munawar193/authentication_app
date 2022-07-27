@@ -314,7 +314,7 @@ class _SignUpPageState extends State<SignUpPage> {
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: 30),
               decoration: BoxDecoration(
-                color: Colors.green,
+                color: Colors.green[400],
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Center(
