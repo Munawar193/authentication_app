@@ -1,6 +1,8 @@
 import 'package:authentication_app/auth/providers/auth_cubit.dart';
+import 'package:authentication_app/auth/utils/auth_validasi.dart';
 import 'package:authentication_app/presentation/pages/sign_in_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,7 +21,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController passwordConfirmeController =
       TextEditingController(text: '');
 
-  bool isChecked = false;
+  final _formKey = GlobalKey<FormState>();
+
+  bool _isChecked = false;
   bool _isVisible = false;
   bool _isVisibleConfirme = false;
 
@@ -39,7 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     Widget header() {
       return Container(
-        margin: const EdgeInsets.only(top: 60),
+        margin: const EdgeInsets.only(top: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -82,6 +86,18 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         child: Center(
           child: TextFormField(
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                RegExp(r"[a-zA-Z]+|\s"),
+              )
+            ],
+            validator: (val) {
+              if (!val!.isValidName) {
+                return 'Nama tidak boleh kosong';
+              } else {
+                return null;
+              }
+            },
             controller: nameController,
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w400,
@@ -116,6 +132,10 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         child: Center(
           child: TextFormField(
+            validator: (val) {
+              if (!val!.isValidEmail) return 'email tidak boleh kosong';
+              return null;
+            },
             controller: emailController,
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.w400,
@@ -197,7 +217,9 @@ class _SignUpPageState extends State<SignUpPage> {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
         decoration: BoxDecoration(
           color: Colors.white60.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(
+            14,
+          ),
         ),
         child: Center(
           child: TextFormField(
@@ -254,10 +276,10 @@ class _SignUpPageState extends State<SignUpPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
-              value: isChecked,
+              value: _isChecked,
               onChanged: (bool? value) {
                 setState(() {
-                  isChecked = value!;
+                  _isChecked = value!;
                 });
               },
             ),
@@ -319,17 +341,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 ),
               );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Colors.red,
-                  content: Text(
-                    state.error,
-                    style: GoogleFonts.montserrat(
-                        fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              );
             }
           }
         },
@@ -377,7 +388,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   );
-                } else if (!isChecked) {
+                } else if (!_isChecked) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       backgroundColor: Colors.red,
@@ -389,11 +400,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   );
                 } else {
-                  context.read<AuthCubit>().signUp(
-                        name: nameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
+                  _formKey.currentState!.validate();
+                  if (nameController.text != '') {
+                    context.read<AuthCubit>().signUp(
+                          name: nameController.text,
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+                  }
                 }
               },
               child: Text(
@@ -457,28 +471,31 @@ class _SignUpPageState extends State<SignUpPage> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  header(),
-                  nameInput(),
-                  emailInput(),
-                  passwordInput(),
-                  confirmedPasswordInput(),
-                  checkBox(),
-                ],
-              ),
-              Column(
-                children: [
-                  buttonSubmit(),
-                  signIpButton(),
-                ],
-              ),
-            ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    header(),
+                    nameInput(),
+                    emailInput(),
+                    passwordInput(),
+                    confirmedPasswordInput(),
+                    checkBox(),
+                  ],
+                ),
+                Column(
+                  children: [
+                    buttonSubmit(),
+                    signIpButton(),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

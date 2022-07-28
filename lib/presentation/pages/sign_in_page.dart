@@ -157,14 +157,43 @@ class _SignInPageState extends State<SignInPage> {
             Navigator.pushNamedAndRemoveUntil(
                 context, '/main', (route) => false);
           } else if (state is AuthFailed) {
-            SnackBar(
-              backgroundColor: Colors.red,
-              content: Text(
-                state.error,
-                style: GoogleFonts.montserrat(
-                    fontSize: 14, fontWeight: FontWeight.w600),
-              ),
-            );
+            if (state.error ==
+                "[firebase_auth/user-not-found] There is no user record corresponding to this identifier. The user may have been deleted.") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    "Email yang kamu masukkan salah",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              );
+            } else if (state.error ==
+                "[firebase_auth/wrong-password] The password is invalid or the user does not have a password.") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    "Password yang kamu masukkan salah",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              );
+            } else if (state.error ==
+                "[firebase_auth/too-many-requests] We have blocked all requests from this device due to unusual activity. Try again later.") {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: Colors.red,
+                  content: Text(
+                    "Gagal melakukan login cobalah beberapa saat lagi",
+                    style: GoogleFonts.montserrat(
+                        fontSize: 14, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              );
+            }
           }
         },
         builder: (context, state) {

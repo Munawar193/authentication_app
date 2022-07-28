@@ -17,6 +17,8 @@ class AuthService {
         password: password,
       );
 
+      _auth.currentUser!.updateDisplayName(name);
+
       UserModel user = UserModel(
         id: userCredential.user!.uid,
         name: name,
